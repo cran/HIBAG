@@ -1,5 +1,5 @@
-\name{hlaClusterAttrBagging}
-\alias{hlaClusterAttrBagging}
+\name{hlaParallelAttrBagging}
+\alias{hlaParallelAttrBagging}
 \title{
 	Build a HIBAG model via parallel computation
 }
@@ -7,13 +7,12 @@
 	To build an attribute bagging model for predicting HLA types via parallel computation
 }
 \usage{
-hlaClusterAttrBagging(cl, hla, genotype, nclassifier=100, mtry=c("sqrt", "all", "one"),
+hlaParallelAttrBagging(cl, hla, genotype, nclassifier=100, mtry=c("sqrt", "all", "one"),
 	prune=TRUE, rm.na=TRUE, verbose=TRUE, verbose.detail=FALSE)
 }
 \arguments{
 	\item{cl}{a cluster object, created by this package or by the package
-		\link[parallel]{parallel} or \href{http://CRAN.R-project.org/package=snow}{snow}.
-		If NULL, use the registered default cluster.}
+		\link[parallel]{parallel} or \href{http://CRAN.R-project.org/package=snow}{snow}}
 	\item{hla}{training HLA types, an object of \code{\link{hlaAlleleClass}}}
 	\item{genotype}{training genotypes, a genotype object of \code{\link{hlaSNPGenoClass}}}
 	\item{nclassifier}{the total number of individual classifiers}
@@ -98,7 +97,7 @@ set.seed(100)
 
 # train an attribute bagging model
 # please try "nclassifier=25" or "nclassifier=100" when you use HIBAG for real data
-model <- hlaClusterAttrBagging(cl, hlatab$training, train.geno, nclassifier=4, verbose.detail=TRUE)
+model <- hlaParallelAttrBagging(cl, hlatab$training, train.geno, nclassifier=4)
 summary(model)
 
 # validation
@@ -109,6 +108,9 @@ comp <- hlaCompareAllele(hlatab$validation, pred, allele.limit=model$hla.allele,
 comp
 # total.num.ind crt.num.ind crt.num.haplo  acc.ind acc.haplo call.threshold n.call call.rate
 #            26          20            41 0.952381 0.9761905            0.5     21 0.8076923
+
+# stop parallel nodes
+stopCluster(cl)
 }
 
 \keyword{HLA}

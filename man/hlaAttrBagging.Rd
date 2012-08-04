@@ -94,9 +94,12 @@ summary(model)
 # validation
 pred <- predict(model, test.geno)
 # compare
-comp <- hlaCompareAllele(hlatab$validation, pred, allele.limit=model$hla.allele,
-	call.threshold=0.5)
-comp
+(comp <- hlaCompareAllele(hlatab$validation, pred, allele.limit=model$hla.allele,
+	call.threshold=0))
+# total.num.ind crt.num.ind crt.num.haplo   acc.ind acc.haplo call.threshold n.call call.rate
+#            26          23            49 0.8846154 0.9423077              0     26         1
+(comp <- hlaCompareAllele(hlatab$validation, pred, allele.limit=model$hla.allele,
+	call.threshold=0.5))
 # total.num.ind crt.num.ind crt.num.haplo   acc.ind acc.haplo call.threshold n.call call.rate
 #            26          20            42 0.9090909 0.9545455            0.5     22 0.8461538
 
@@ -124,9 +127,12 @@ hlatab <- get(load("HLASplit.RData"))
 
 pred <- predict(model, test.geno, type="response")
 # compare
-comp <- hlaCompareAllele(hlatab$validation, pred, allele.limit=model$hla.allele,
-	call.threshold=0.5)
-comp
+(comp <- hlaCompareAllele(hlatab$validation, pred, allele.limit=model$hla.allele,
+	call.threshold=0))
+# total.num.ind crt.num.ind crt.num.haplo   acc.ind acc.haplo call.threshold n.call call.rate
+#            26          23            49 0.8846154 0.9423077              0     26         1
+(comp <- hlaCompareAllele(hlatab$validation, pred, allele.limit=model$hla.allele,
+	call.threshold=0.5))
 # total.num.ind crt.num.ind crt.num.haplo   acc.ind acc.haplo call.threshold n.call call.rate
 #            26          20            42 0.9090909 0.9545455            0.5     22 0.8461538
 }
