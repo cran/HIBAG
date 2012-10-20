@@ -5,12 +5,31 @@
 //    _/    _/       _/             _/    _/    _/   _/
 // _/_/_/   _/_/_/  _/_/_/_/_/     _/     _/_/_/   _/_/
 // ===========================================================
+//
+// Copyright (C) 2012	Xiuwen Zheng
+//
+// This file is part of HIBAG package.
+//
+// HIBAG is free software: you can redistribute it and/or modify it
+// under the terms of the GNU Lesser General Public License Version 3 as
+// published by the Free Software Foundation.
+//
+// HIBAG is distributed in the hope that it will be useful, but
+// WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with CoreArray.
+// If not, see <http://www.gnu.org/licenses/>.
+
+// ===========================================================
 // Name        : LibHLA
 // Author      : Xiuwen Zheng
-// Version     : 1.0.0.0
+// Version     : 0.9.3.0
 // Copyright   : Xiuwen Zheng (GPL v3.0)
-// Created     : 06/21/2012
-// Description : An Attribute Bagging Method for Imputing HLA Types with SNP Data
+// Created     : 10/13/2012
+// Description : HLA Genotype Imputation with Attribute Bagging
 // ===========================================================
 
 #ifndef _LibHLA_H_
