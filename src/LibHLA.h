@@ -6,29 +6,29 @@
 // _/_/_/   _/_/_/  _/_/_/_/_/     _/     _/_/_/   _/_/
 // ===========================================================
 //
-// Copyright (C) 2012	Xiuwen Zheng
+// Copyright (C) 2013	Xiuwen Zheng (zhengx@u.washington.edu)
 //
 // This file is part of HIBAG package.
 //
 // HIBAG is free software: you can redistribute it and/or modify it
-// under the terms of the GNU Lesser General Public License Version 3 as
+// under the terms of the GNU General Public License Version 3 as
 // published by the Free Software Foundation.
 //
 // HIBAG is distributed in the hope that it will be useful, but
 // WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser General Public License for more details.
+// GNU General Public License for more details.
 //
-// You should have received a copy of the GNU Lesser General Public
-// License along with CoreArray.
+// You should have received a copy of the GNU General Public License
+// along with HIBAG.
 // If not, see <http://www.gnu.org/licenses/>.
 
 // ===========================================================
 // Name        : LibHLA
 // Author      : Xiuwen Zheng
-// Version     : 0.9.4
+// Version     : 1.0.0
 // Copyright   : Xiuwen Zheng (GPL v3.0)
-// Created     : 11/14/2012
+// Created     : 11/14/2011
 // Description : HLA Genotype Imputation with Attribute Bagging
 // ===========================================================
 
@@ -62,6 +62,7 @@ namespace HLA_LIB
 	// SNP genotype: 0, 1, 2, 3 (missing, or other values)
 	// HLA allele: start from 0
 	//
+	// Packed SNP storage strategy is used for faster matching
 	// Packed SNP alleles: s8 s7 s6 s5 s4 s3 s2 s1
 	//     the 1st allele: (s1), the 2nd allele: (s3)
 	//     the 3rd allele: (s5), the 4th allele: (s7)
@@ -91,7 +92,7 @@ namespace HLA_LIB
 	#define PACKED_NUM_IN_BYTE(x)	( ((x)/4) + (((x) % 4)!=0 ? 1 : 0) )
 
 	/// The max number of SNP markers in an individual classifier
-	static const int MAXNUM_SNP_IN_CLASSIFIER = 128;
+	static const int MAXNUM_SNP_IN_CLASSIFIER = 256;
 	/// The max number of bytes for packed SNP genotypes
 	static const int PACKED_BYTE_MAXNUM_SNP = PACKED_NUM_IN_BYTE(MAXNUM_SNP_IN_CLASSIFIER);
 
@@ -272,10 +273,10 @@ namespace HLA_LIB
 	// the parameter of EM algorithm for estimating haplotype frequencies
 
 	/// The max number of iterations
-	extern int EM_MaxNum_Iterations;  // 500
+	extern int EM_MaxNum_Iterations;  // = 500
 
 	/// The reltol convergence tolerance, sqrt(machine.epsilon) by default, used in EM algorithm
-	extern double EM_FuncRelTol;  // sqrt(DBL_EPSILON)
+	extern double EM_FuncRelTol;  // = sqrt(DBL_EPSILON)
 
 
 	/// variable sampling
@@ -353,10 +354,10 @@ namespace HLA_LIB
 		/// A pair of haplotypes
 		struct THaploPair
 		{
-			bool Flag;  //< if true, the haplotype pair exists in the sample
+			bool Flag;       //< if true, the haplotype pair exists in the sample
 			THaplotype *H1;  //< the first haplotype
 			THaplotype *H2;  //< the second haplotype
-			double Freq;  //< genotype frequency
+			double Freq;     //< genotype frequency
 
 			THaploPair() { Flag = true; H1 = H2 = NULL; }
 			THaploPair(THaplotype *i1, THaplotype *i2) { Flag = true; H1 = i1; H2 = i2; }
@@ -365,8 +366,8 @@ namespace HLA_LIB
 		/// A list of haplotype pairs
 		struct THaploPairList
 		{
-			int BootstrapCount;  //< the count in the bootstrapped data
-			int SampIndex;  //< the sample index in the source data
+			int BootstrapCount;           //< the count in the bootstrapped data
+			int SampIndex;                //< the sample index in the source data
 			vector<THaploPair> PairList;  //< a list of haplotype pairs
 			
 			/// print information
@@ -475,11 +476,11 @@ namespace HLA_LIB
 
 
 	// ******************************************************************************* //
-	// ********                             model                             ********
+	// ********                        HIBAG -- model                         ********
 
 	class CAttrBag_Model;
 
-	/// the individual classifier
+	/// the individual classifier of HIBAG
 	class CAttrBag_Classifier
 	{
 	public:
@@ -525,7 +526,7 @@ namespace HLA_LIB
 	};
 
 
-	/// the attribute bagging model
+	/// HIBAG -- the attribute bagging model
 	class CAttrBag_Model
 	{
 	public:
@@ -650,15 +651,5 @@ namespace HLA_LIB
 		std::string fMessage;
 	};
 }
-
-
-#ifdef  __cplusplus
-extern "C" {
-#endif
-	void Rprintf(const char *, ...);
-#ifdef  __cplusplus
-}
-#endif
-
 
 #endif /* _LibHLA_H_ */

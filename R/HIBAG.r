@@ -1,6 +1,6 @@
 #######################################################################
 #
-# Package Name: HIBAG v0.9.4
+# Package Name: HIBAG v1.0.0
 #
 # Description:
 #   HIBAG -- HLA Genotype Imputation with Attribute Bagging
@@ -281,7 +281,7 @@ hlaGenoSwitchStrand <- function(target, template, match.pos=TRUE, verbose=TRUE)
 	}
 
 	# call
-	gz <- .C("hlaAlleleStrand", template$snp.allele, template.afreq, I1,
+	gz <- .C("HIBAG_AlleleStrand", template$snp.allele, template.afreq, I1,
 		target$snp.allele, target.afreq, I2, length(s), out=logical(length(s)),
 		out.n.ambiguity=integer(1), out.n.mismatching=integer(1),
 		err=integer(1), NAOK=TRUE, PACKAGE="HIBAG")
@@ -466,7 +466,7 @@ hlaBED2Geno <- function(bed.fn, fam.fn, bim.fn, rm.invalid.allele=FALSE,
 	stopifnot(is.logical(verbose))
 
 	# detect bed.fn
-	bed <- .C("hlaBEDFlag", bed.fn, snporder=integer(1), err=integer(1),
+	bed <- .C("HIBAG_BEDFlag", bed.fn, snporder=integer(1), err=integer(1),
 		NAOK=TRUE, PACKAGE="HIBAG")
 	if (bed$err != 0) stop(hlaErrMsg())
 	if (verbose)
@@ -527,7 +527,7 @@ hlaBED2Geno <- function(bed.fn, fam.fn, bim.fn, rm.invalid.allele=FALSE,
 	if (n.snp <= 0) stop("There is no SNP imported.")
 
 	# call the C function
-	rv <- .C("hlaConvBED", bed.fn, length(sample.id), length(snp.id), n.snp,
+	rv <- .C("HIBAG_ConvBED", bed.fn, length(sample.id), length(snp.id), n.snp,
 		(bed$snporder==0), snp.flag, verbose,
 		geno = matrix(as.integer(0), nrow=n.snp, ncol=length(sample.id)),
 		err=integer(1), NAOK=TRUE, PACKAGE="HIBAG")
@@ -839,7 +839,7 @@ hlaUniqueAllele <- function(hla)
 	{
 		hla <- hla[!is.na(hla)]
 		hla <- unique(hla)
-		rv <- .C("hlaSortAlleleStr", length(hla), hla, out = character(length(hla)),
+		rv <- .C("HIBAG_SortAlleleStr", length(hla), hla, out = character(length(hla)),
 			err = integer(1), NAOK = TRUE, PACKAGE = "HIBAG")
 		if (rv$err != 0) stop(hlaErrMsg())
 		rv$out
@@ -1188,7 +1188,7 @@ hlaCompareAllele <- function(TrueHLA, PredHLA, allele.limit=NULL,
 	} else {
 		nw <- ncol(WrongTab)
 	}
-	rv <- .C("hlaConfusion", as.integer(m), confusion,
+	rv <- .C("HIBAG_Confusion", as.integer(m), confusion,
 		nw, match(WrongTab, names(PredNum)) - as.integer(1),
 		out = matrix(0.0, nrow=m+1, ncol=m, dimnames=list(Predict=names(PredNum), True=names(TrueNum))),
 		tmp = double((m+1)*m),
@@ -1408,7 +1408,7 @@ summary.hlaAlleleClass <- function(object, show=TRUE, ...)
 ##########################################################################
 ##########################################################################
 #
-# Attribute Bagging (AB) method
+# Attribute Bagging (AB) method -- HIBAG algorithm
 #
 
 ##########################################################################
@@ -1493,7 +1493,7 @@ hlaAttrBagging <- function(hla, genotype, nclassifier=100, mtry=c("sqrt", "all",
 	H2 <- as.integer(H[(n.samp+1):(2*n.samp)]) - as.integer(1)
 
 	# create an attribute bagging object
-	rv <- .C("hlaAB_Model_Training", n.snp, n.samp, snp.geno, n.hla,
+	rv <- .C("HIBAG_Training", n.snp, n.samp, snp.geno, n.hla,
 		H1, H2, AB=integer(1), err=integer(1),
 		NAOK = TRUE, PACKAGE = "HIBAG")
 	if (rv$err != 0) stop(hlaErrMsg())
@@ -1543,7 +1543,7 @@ hlaAttrBagging <- function(hla, genotype, nclassifier=100, mtry=c("sqrt", "all",
 	###################################################################
 	# training ...
 	# add new individual classifers
-	rv <- .C("hlaAB_NewClassifiers", ABmodel, as.integer(nclassifier),
+	rv <- .C("HIBAG_NewClassifiers", ABmodel, as.integer(nclassifier),
 		as.integer(mtry), as.logical(prune), verbose, verbose.detail, debug=FALSE,
 		err=integer(1), NAOK = TRUE, PACKAGE = "HIBAG")
 	if (rv$err != 0) stop(hlaErrMsg())
@@ -1675,7 +1675,7 @@ hlaClose <- function(model)
 	stopifnot(class(model) == "hlaAttrBagClass")
 
 	# class handler
-	rv <- .C("hlaAB_Close", model$model, err=integer(1), NAOK = TRUE, PACKAGE = "HIBAG")
+	rv <- .C("HIBAG_Close", model$model, err=integer(1), NAOK = TRUE, PACKAGE = "HIBAG")
 	if (rv$err != 0) stop(hlaErrMsg())
 
 	# output
@@ -1759,7 +1759,7 @@ predict.hlaAttrBagClass <- function(object, genotypes, type=c("response", "prob"
 	if (verbose)
 	{
 		# call, get the number of classifiers
-		rv <- .C("hlaAB_GetNumClassifiers", object$model, CNum = integer(1),
+		rv <- .C("HIBAG_GetNumClassifiers", object$model, CNum = integer(1),
 			err=integer(1), NAOK=TRUE, PACKAGE="HIBAG")
 		if (rv$err != 0) stop(hlaErrMsg())
 
@@ -1888,7 +1888,7 @@ predict.hlaAttrBagClass <- function(object, genotypes, type=c("response", "prob"
 	# to predict HLA types
 	if (type[1] == "response")
 	{
-		rv <- .C("hlaAB_Predict", object$model, as.integer(genotypes), n.samp,
+		rv <- .C("HIBAG_Predict", object$model, as.integer(genotypes), n.samp,
 			as.logical(verbose), H1=integer(n.samp), H2=integer(n.samp),
 			prob=double(n.samp), err=integer(1), NAOK=TRUE, PACKAGE="HIBAG")
 		if (rv$err != 0) stop(hlaErrMsg())
@@ -1900,7 +1900,7 @@ predict.hlaAttrBagClass <- function(object, genotypes, type=c("response", "prob"
 		NA.cnt <- sum(is.na(res$value$allele1) | is.na(res$value$allele2))
 
 	} else {
-		rv <- .C("hlaAB_Predict_Prob", object$model, as.integer(genotypes), n.samp,
+		rv <- .C("HIBAG_Predict_Prob", object$model, as.integer(genotypes), n.samp,
 			as.logical(verbose), prob=matrix(NaN, nrow=n.hla*(n.hla+1)/2, ncol=n.samp),
 			err=integer(1), NAOK=TRUE, PACKAGE="HIBAG")
 		if (rv$err != 0) stop(hlaErrMsg())
@@ -1947,7 +1947,7 @@ hlaModelToObj <- function(model)
 	stopifnot(class(model)=="hlaAttrBagClass")
 
 	# call, get the number of classifiers
-	rv <- .C("hlaAB_GetNumClassifiers", model$model, CNum = integer(1),
+	rv <- .C("HIBAG_GetNumClassifiers", model$model, CNum = integer(1),
 		err=integer(1), NAOK=TRUE, PACKAGE="HIBAG")
 	if (rv$err != 0) stop(hlaErrMsg())
 
@@ -1956,7 +1956,7 @@ hlaModelToObj <- function(model)
 	for (i in 1:length(res))
 	{
 		# call, get the number of haplotypes
-		rv <- .C("hlaAB_Idv_GetNumHaplo", model$model, as.integer(i),
+		rv <- .C("HIBAG_Idv_GetNumHaplo", model$model, as.integer(i),
 			NumHaplo = integer(1), NumSNP = integer(1),
 			err=integer(1), NAOK=TRUE, PACKAGE="HIBAG")
 		if (rv$err != 0) stop(hlaErrMsg())
@@ -1968,7 +1968,7 @@ hlaModelToObj <- function(model)
 			n.trio <- model$n.samp
 
 		# call, get freq. and haplotypes
-		rv <- .C("hlaAB_Tree_GetHaplos", model$model, as.integer(i),
+		rv <- .C("HIBAG_Classifier_GetHaplos", model$model, as.integer(i),
 			freq=double(rv$NumHaplo), hla=integer(rv$NumHaplo), haplo=character(rv$NumHaplo),
 			snpidx = integer(rv$NumSNP), samp.num = integer(n.trio), acc = double(1),
 			err=integer(1), NAOK=TRUE, PACKAGE="HIBAG")
@@ -2046,7 +2046,7 @@ hlaModelfromObj <- function(obj)
 	stopifnot(class(obj) == "hlaAttrBagObj")
 
 	# create an attribute bagging object
-	rv <- .C("hlaAB_Model_New",
+	rv <- .C("HIBAG_New",
 		as.integer(obj$n.samp), as.integer(obj$n.snp), length(obj$hla.allele),
 		model = integer(1), err=integer(1), NAOK=TRUE, PACKAGE="HIBAG")
 	if (rv$err != 0) stop(hlaErrMsg())
@@ -2062,7 +2062,7 @@ hlaModelfromObj <- function(obj)
 			snum <- rep(as.integer(1), obj$n.samp)
 		else
 			snum <- tree$samp.num
-		rv <- .C("hlaAB_NewClassifierHaplo", ABmodel, length(tree$snpidx),
+		rv <- .C("HIBAG_NewClassifierHaplo", ABmodel, length(tree$snpidx),
 			as.integer(tree$snpidx-1), as.integer(snum), dim(tree$haplos)[1],
 			as.double(tree$haplos$freq), as.integer(hla), as.character(tree$haplos$haplo),
 			as.double(tree$outofbag.acc), err=integer(1), NAOK=TRUE, PACKAGE="HIBAG")
@@ -2143,69 +2143,6 @@ summary.hlaAttrBagObj <- function(object, show=TRUE, ...)
 		snp.id = obj$snp.id, snp.position = obj$snp.position,
 		snp.hist = snp.hist, info = info)
 	return(invisible(rv))
-}
-
-
-##########################################################################
-# To calculate linkage disequilibrium between HLA locus and a SNP marker
-#
-
-hlaLD_HLA <- function(HLA, snp)
-{
-	# check
-	stopifnot(class(HLA) == "hlaAlleleClass")
-	stopifnot(is.vector(snp))
-	stopifnot(is.numeric(snp))
-	stopifnot(dim(HLA$value)[1] == length(snp))
-
-	# HLA alleles
-	flag <- is.finite(snp)
-	alleles <- unique(c(HLA$value$allele1[flag], HLA$value$allele2[flag]))
-	alleles <- alleles[order(alleles)]
-	rv <- rep(NaN, length(alleles))
-	for (i in 1:length(alleles))
-	{
-		x <- (HLA$value$allele1==alleles[i]) + (HLA$value$allele2==alleles[i])
-		rv[i] <- cor(x, snp, use="complete.obs")^2
-	}
-
-	mean(rv, ra.rm=TRUE)
-}
-
-
-##########################################################################
-# To calculate linkage disequilibrium between HLA locus and SNP markers
-#
-
-hlaGenoLD <- function(hla, geno)
-{
-	# check
-	stopifnot(class(hla) == "hlaAlleleClass")
-	if (class(geno) == "hlaSNPGenoClass")
-	{
-		stopifnot(dim(hla$value)[1] == length(geno$sample.id))
-		geno <- geno$genotype
-	} else if (is.matrix(geno))
-	{
-		stopifnot(dim(hla$value)[1] == dim(geno)[2])
-	} else {
-		stop("geno should be `hlaSNPGenoClass' or a matrix.")
-	}
-
-	# HLA alleles indicators
-	alleles <- unique(c(hla$value$allele1, hla$value$allele2))
-	alleles <- alleles[order(alleles)]
-	allele.mat <- matrix(as.integer(0), nrow=length(hla$value$allele1), ncol=length(alleles))
-	for (i in 1:length(alleles))
-	{
-		allele.mat[, i] <- (hla$value$allele1==alleles[i]) + (hla$value$allele2==alleles[i])
-	}
-
-	apply(geno, 1,
-		function(x, allele.mat) {
-			suppressWarnings(mean(cor(x, allele.mat, use="pairwise.complete.obs")^2, na.rm=TRUE))
-		},
-		allele.mat=allele.mat)
 }
 
 
@@ -2325,17 +2262,13 @@ print.hlaAttrBagObj <- function(x, ...)
 
 
 
-
-
-
-
 #######################################################################
 # To get the error message
 #
 
 hlaErrMsg <- function()
 {
-	rv <- .C("hlaErrMsg", msg=character(1), NAOK=TRUE, PACKAGE="HIBAG")
+	rv <- .C("HIBAG_ErrMsg", msg=character(1), NAOK=TRUE, PACKAGE="HIBAG")
 	rv$msg
 }
 
@@ -2347,18 +2280,14 @@ hlaErrMsg <- function()
 
 .onAttach <- function(lib, pkg)
 {
-	# load the dynamic-link library
-	library.dynam("HIBAG", pkg, lib)
 	# initialize HIBAG
-	.C("hlaInit", PACKAGE="HIBAG")
-	# set random number generator
-	RNGkind("L'Ecuyer-CMRG")
+	.C("HIBAG_Init", PACKAGE="HIBAG")
 	TRUE
 }
 
 .Last.lib <- function(libpath)
 {
 	# finalize HIBAG
-	rv <- .C("hlaDone", PACKAGE="HIBAG")
+	rv <- .C("HIBAG_Done", PACKAGE="HIBAG")
 	TRUE
 }
