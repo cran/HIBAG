@@ -1,3 +1,8 @@
+Changes in 1.2.0.1:
+
+	* support Windows platform
+
+
 Changes in 1.2.0:
 
 	* optimize the C code: replace some intensive 'exp' and 'log' calculations by precalculated values, roughly 250% ~ 400% speedup

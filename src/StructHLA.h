@@ -59,7 +59,7 @@ typedef uint64_t  UINT64;
 #define HIBAG_PACKED_NUM_IN_UTYPE(x)  (((x)/4) + (((x) % 4)!=0 ? 1 : 0))
 
 /// The max number of SNP markers in an individual classifier
-#define HIBAG_MAXNUM_SNP_IN_CLASSIFIER	256u
+#define HIBAG_MAXNUM_SNP_IN_CLASSIFIER	256
 
 /// The max number of bytes or shorts for packed SNP genotypes
 #define HIBAG_PACKED_UTYPE_MAXNUM_SNP		\

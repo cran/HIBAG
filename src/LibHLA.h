@@ -41,9 +41,9 @@
 #include <string.h>
 #include <stdarg.h>
 #include <time.h>
+#include <math.h>
 #include <R.h>
 #include <Rmath.h>
-#include <cmath>
 #include <vector>
 #include <list>
 #include <string>

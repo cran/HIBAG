@@ -3367,7 +3367,7 @@ hlaErrMsg <- function()
 
 	# information
 	packageStartupMessage(
-		"HIBAG (HLA Genotype Imputation with Attribute Bagging): v1.2.0")
+		"HIBAG (HLA Genotype Imputation with Attribute Bagging): v1.2.1")
 	if (rv$SSE.Flag != 0)
 		packageStartupMessage("Supported by Streaming SIMD Extensions 2 (SSE2)")
 

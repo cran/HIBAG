@@ -41,8 +41,7 @@
 #endif
 
 
-
-#include <LibHLA.h>
+#include <StructHLA.h>
 
 #ifdef HIBAG_GPU_SUPPORT
 #  if defined(HIBAG_SYS_UNIX)
@@ -54,6 +53,7 @@
 #  endif
 #endif
 
+#include <LibHLA.h>
 
 #define HIBAG_TIMING	0
 // 0: No timing

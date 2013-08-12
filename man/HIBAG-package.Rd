@@ -12,7 +12,7 @@ method.
 		Package: \tab HIBAG\cr
 		Type:    \tab Package\cr
 		Version: \tab 1.2.0\cr
-		Date:    \tab 2013-07-02\cr
+		Date:    \tab 2013-08-12\cr
 		License: \tab GPL version 3\cr
 	}
 
