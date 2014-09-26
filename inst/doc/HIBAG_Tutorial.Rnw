@@ -316,6 +316,24 @@ save(mobj, file="Your_HIBAG_Model.RData")
 \end{Schunk}
 
 
+%     ---- Release a collection of HIBAG models ----
+\subsection{Release a collection of HIBAG models}
+
+\begin{Schunk}
+\singlespace
+\begin{Sinput}
+# assume the HIBAG models are stored in R objects: mobj.A, mobj.B, ...
+
+ModelList <- list()
+ModelList[["A"]] <- mobj.A
+ModelList[["B"]] <- mobj.B
+...
+
+# save to an R data file
+save(ModelList, file="HIBAG_Model_List.RData")
+\end{Sinput}
+\end{Schunk}
+
 
 % ---- Resources ----
 \section{Resources}

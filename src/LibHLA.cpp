@@ -26,7 +26,7 @@
 // ===============================================================
 // Name           : LibHLA
 // Author         : Xiuwen Zheng
-// Version        : 1.2.3
+// Version        : 1.2.4
 // Copyright      : Xiuwen Zheng (GPL v3.0)
 // Created        : 11/14/2011
 // Last modified  : 10/29/2013
@@ -1205,7 +1205,7 @@ void CAlg_EM::ExpectationMaximization(CHaplotypeList &NextHaplo)
 #endif
 
 	// the converage tolerance
-	TFLOAT ConvTol, LogLik = -1e+30;
+	TFLOAT ConvTol = 0, LogLik = -1e+30;
 
 	// iterate ...
 	for (int iter=0; iter <= EM_MaxNum_Iterations; iter++)
